@@ -1,59 +1,73 @@
-Program Main;
-uses Windows, Crt, SysUtils, UBoard, UBoardRow, UBoardNode, UPlant;
+program Main;
+
+uses
+  Windows, Crt, SysUtils, UBoard, UBoardRow, UBoardNode, UPlant;
+
 var
-    Board: TBoard;
-    ABoard: array of TBoardRow;
-    ARow: array of TBoardNode;
-    i, j: integer;
-    s: string;
-    st: array of string;
-    flag: Boolean;
+  Board: TBoard;
+  ABoard: array of TBoardRow;
+  ARow: array of TBoardNode;
+  RowIndex, ColIndex: integer;
+  CellContent, PlantZombieHealth: string;
+
 begin
-    Board := TBoard.Create(10,0,250); // Создаем модель из 10 зомби, нулевым счетом и 250 монетами
-    for i := 0 to BOARD_ROWS do Board.AddPlant(i,0,TPlant.Create('Plant1', 500, 20, 'Image')); // Создаем растения
-    SetLength(st, 5);
-    while true do
-      begin
-        Board.RunBoard; // Основная процедура обновления модели
-        ClrScr;
-        if Board.HasWon then
+  // Create a model with 10 zombies, a score of 0 and 250 coins
+  Board := TBoard.Create(10,0,250);
+
+  // Create plants
+  for RowIndex := 0 to BOARD_ROWS do
+    Board.AddPlant(RowIndex,0,TPlant.Create('Plant1', 500, 20, 'Image'));
+
+  while true do
+    begin
+      // Main procedure for updating the model
+      Board.RunBoard;
+      ClrScr;
+
+      if Board.HasWon or Board.HasLost then
+        begin
+          if Board.HasWon then WriteLn('You won!') else WriteLn('You lost!');
+          Break;
+        end;
+
+      // Get rows from the model
+      ABoard := Board.GetBoard;
+
+      for RowIndex := 0 to BOARD_ROWS - 1 do
+        begin
+          // Get cells from the row
+          ARow := ABoard[RowIndex].getRow;
+          CellContent := '';
+          PlantZombieHealth := '';
+
+          for ColIndex := 0 to BOARD_COLS - 1 do
             begin
-              WriteLn('You won!');
-              Break;
+              // Check cell content
+              if not (ARow[ColIndex].hasPlant or ARow[ColIndex].hasZombie) then
+                begin
+                  CellContent += '_';
+                  Continue;
+                end;
+
+              if ARow[ColIndex].hasPlant then
+                begin
+                  if ARow[ColIndex].hasZombie then CellContent += 'F' else CellContent += 'P';
+                  PlantZombieHealth += ' P ' + IntToStr(ARow[ColIndex].getPlant.getHealth);
+                end;
+
+              if ARow[ColIndex].hasZombie then
+                begin
+                  if not ARow[ColIndex].hasPlant then CellContent += 'Z';
+                  PlantZombieHealth += ' Z ' + IntToStr(ARow[ColIndex].getZombie.getHealth);
+                end;
             end;
-        if Board.HasLost then
-            begin
-              WriteLn('You lost!');
-              Break;
-            end;
-        ABoard := Board.GetBoard; // Получаем строки из модели
-        for i := 0 to BOARD_ROWS - 1 do
-          begin
-            ARow := ABoard[i].getRow; // Получаем ячейки из строки
-            s := '';
-            st[i] := '';
-            for j := 0 to BOARD_COLS - 1 do
-              begin
-                flag := False;
-                // Проверяем содержимое ячейки
-                if ARow[j].hasPlant then
-                    begin
-                        if ARow[j].hasZombie then s += 'F' else s += 'P';
-                        st[i] += ' P ' + IntToStr(ARow[j].getPlant.getHealth);
-                        flag := True;
-                    end;
-                if ARow[j].hasZombie then
-                    begin
-                        if not ARow[j].hasPlant then s += 'Z';
-                        st[i] += ' Z ' + IntToStr(ARow[j].getZombie.getHealth);
-                        flag := True;
-                    end;      
-                if not flag then s += '_';
-              end;
-            writeln(s+st[i]);
-          end;
-        writeln('Score: ' + IntToStr(Board.GetScore));
-        Sleep(3000);
-      end;
+
+          writeln(CellContent + PlantZombieHealth);
+        end;
+
+      writeln('Money: ' + IntToStr(Board.GetMoney) + ' Score: ' + IntToStr(Board.GetScore));
+      Sleep(3000);
+    end;
+
     readln;
 end.

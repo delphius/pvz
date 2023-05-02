@@ -47,6 +47,7 @@ constructor TBoard.Create(zombiesToSpawn: integer; score: integer; money: intege
 var
   i: integer;
 begin
+  Randomize;
   FScore := score;
   FMoney := money;
   FZombiesToSpawn := zombiesToSpawn;
@@ -70,6 +71,7 @@ var
   key: string;
   temp: integer;
 begin
+  Randomize;
   FScore := score;
   FMoney := money;
   FZombieScope := zombieScope;
