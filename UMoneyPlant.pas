@@ -1,7 +1,5 @@
+{This is a plant class that generates money}
 unit UMoneyPlant;
-{
-This is a plant class that generates money
-}
 
 interface
 

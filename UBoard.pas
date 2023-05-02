@@ -1,8 +1,6 @@
+{Generates board that contains BoardRows based on BoardNodes}
 Unit UBoard;
 {$mode delphi}
-{
-Generates board that contains BoardRows based on BoardNodes
-}
 
 interface
 

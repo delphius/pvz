@@ -1,8 +1,6 @@
 
+{This class is responsible for making zombies and making them attack}
 unit UZombie;
-{
-This class is responsible for making zombies and making them attack
-}
 
 interface
 

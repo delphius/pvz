@@ -1,9 +1,7 @@
+{Holds instances of the BoardNodes and creates virtual row on the board.
+Simulates moving and fighting between Plants and Zombies in current row.}
 Unit UBoardRow;
 {$mode delphi}
-{
-Holds instances of the BoardNodes and creates virtual row on the board.
-Simulates moving and fighting between Plants and Zombies in current row.
-}
 
 interface
 

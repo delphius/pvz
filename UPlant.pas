@@ -1,8 +1,6 @@
 
+{This class is responsible for making plants and making them attack}
 unit UPlant;
-{
-This class is responsible for making plants and making them attack
-}
 
 interface
 

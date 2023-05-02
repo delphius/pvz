@@ -1,7 +1,5 @@
+{Board node is holding information about NPCs on it.}
 Unit UBoardNode;
-{
-Board node is holding information about NPCs on it.
-}
 
 interface
 
