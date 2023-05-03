@@ -9,7 +9,7 @@ type
     FImgURL: String;
     FHealth: Integer;
     FName: String;
-    FattackPower: Integer;
+    FAttackPower: Integer;
   public
 {
 Initializes a new NPC
@@ -75,7 +75,7 @@ constructor TNPC.Create(name: String; health, attackPower: Integer; imgURL: Stri
 begin
   Self.FName := name;
   Self.FHealth := health;
-  Self.FattackPower := attackPower;
+  Self.FAttackPower := attackPower;
   Self.FImgURL := imgURL;
 end;
 
@@ -96,7 +96,7 @@ end;
 
 function TNPC.getAttackPower: Integer;
 begin
-  Result := FattackPower;
+  Result := FAttackPower;
 end;
 
 function TNPC.getImgURL: String;

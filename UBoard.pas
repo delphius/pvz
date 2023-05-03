@@ -4,12 +4,12 @@ Unit UBoard;
 
 interface
 
-Uses UBoardRow, UPlant, UZombie, generics.collections, sysutils;
+Uses UBoardRow, UPlant, UZombie, sysutils;
 
 type
   TBoard = class(TInterfacedObject)
   private
-    FZombieScope: TDictionary<string, integer>;
+    //FZombieScope: TDictionary<string, integer>;
     FScore: integer;
     FMoney: integer;
     FZombiesToSpawn: integer;
@@ -17,7 +17,7 @@ type
     FBoard: array of TBoardRow;
   public
     constructor Create(zombiesToSpawn: integer; score: integer; money: integer); overload;
-    constructor Create(zombieScope: TDictionary<string, integer>; score: integer; money: integer); overload;
+    //constructor Create(zombieScope: TDictionary<string, integer>; score: integer; money: integer); overload;
     function GetZombieLocation: TArray<integer>;
     function HasWon: boolean;
     function HasLost: boolean;
@@ -52,7 +52,7 @@ begin
   FMoney := money;
   FZombiesToSpawn := zombiesToSpawn;
   FTotalZombies := zombiesToSpawn;
-  FZombieScope := TDictionary<string, integer>.Create;
+  //FZombieScope := TDictionary<string, integer>.Create;
   SetLength(FBoard, BOARD_ROWS);
 
   for i := 0 to BOARD_ROWS - 1 do
@@ -64,7 +64,6 @@ Default constructor with level builder functionality that initializes model for 
 @param zombieScope Map where key is name of the zombie, value - number of zombies of this type to spawn
 @param score          int initial score for the game (round)
 @param money          int initial amount of money
-}
 constructor TBoard.Create(zombieScope: TDictionary<string, integer>; score: integer; money: integer);
 var
   i: integer;
@@ -90,6 +89,7 @@ begin
   for i := 0 to BOARD_ROWS - 1 do
     FBoard[i] := TBoardRow.Create;
 end;
+}
 
 {
 Gets all zombies locations on the board.
@@ -198,16 +198,16 @@ Randomly generates zombies' spawn location on the board
 procedure TBoard.GenerateZombieSpawn;
 var
   randRow: integer;
-  keys: TArray<string>;
-  key: string;
-  multiplier: integer;
+  //keys: TArray<string>;
+  //key: string;
+  //multiplier: integer;
 begin
   if FZombiesToSpawn > 0 then
     if Random(2) = 0 then
     begin
       randRow := Random(BOARD_ROWS);
       if not FBoard[randRow].HasZombie(BOARD_COLS - 1) then
-        if not FZombieScope.Count = 0 then
+        {if not FZombieScope.Count = 0 then
         begin
           keys := FZombieScope.Keys.ToArray;
           for key in keys do
@@ -219,7 +219,7 @@ begin
               Dec(FZombiesToSpawn);
               Break;
             end;
-        end else
+        end else}
         begin
           if Random(2) = 0 then
             AddZombie(randRow, BOARD_COLS - 1, TZombie.Create('Zombie1', 100, 20, 10, 'ImagePath'))
