@@ -12,11 +12,11 @@ var
 
 begin
   // Create a model with 10 zombies, a score of 0 and 250 coins
-  Board := TBoard.Create(10,0,250);
+  Board := TBoard.Create(10,0,300);
 
   // Create plants
-  for RowIndex := 0 to BOARD_ROWS do
-    Board.AddPlant(RowIndex,0,TPlant.Create('Plant1', 500, 20, 'Image'));
+  for RowIndex := 0 to BOARD_ROWS - 1 do
+    Board.AddPlant(RowIndex,0,TPlant.Create('Plant1', 500, 20));
 
   while true do
     begin
@@ -43,9 +43,15 @@ begin
           for ColIndex := 0 to BOARD_COLS - 1 do
             begin
               // Check cell content
-              if not (ARow[ColIndex].hasPlant or ARow[ColIndex].hasZombie) then
+              if not (ARow[ColIndex].hasPlant or ARow[ColIndex].hasZombie or ARow[ColIndex].hasPea) then
                 begin
                   CellContent += '_';
+                  Continue;
+                end;
+              if ARow[ColIndex].hasPea and not ARow[ColIndex].hasPlant then
+                begin
+                  if ARow[ColIndex].hasZombie then CellContent += '*' else CellContent += '-';
+                  if ARow[ColIndex].hasZombie then PlantZombieHealth += ' Z ' + IntToStr(ARow[ColIndex].getZombie.getHealth);
                   Continue;
                 end;
 

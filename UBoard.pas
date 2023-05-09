@@ -4,7 +4,7 @@ Unit UBoard;
 
 interface
 
-Uses UBoardRow, UPlant, UZombie, sysutils;
+Uses UBoardRow, UPlant, UZombie, UPea, sysutils;
 
 type
   TBoard = class(TInterfacedObject)
@@ -20,11 +20,15 @@ type
     function HasWon: boolean;
     function HasLost: boolean;
     procedure FightPlantZombie;
+    procedure HittingZombiePea;
     procedure IncrementMoney;
+    procedure GeneratePeas;
     procedure MoveZombies;
+    procedure MovePeas;
     procedure RunBoard;
     procedure GenerateZombieSpawn;
     function AddPlant(x: integer; y: integer; plant: TPlant): TPlant;
+    function AddPea(x: integer; y: integer; pea: TPea): TPea;
     function AddZombie(x: integer; y: integer; zombie: TZombie): boolean;
     function GetMoney: integer;
     procedure SetMoney(money: integer);
@@ -75,10 +79,10 @@ begin
 
   for i := 0 to BOARD_ROWS - 1 do
     for j := 0 to BOARD_COLS - 1 do
-      if (not FBoard[i].HasPlant(j)) and FBoard[i].HasZombie(j) then
+      if not(FBoard[i].hasPlant(j)) and FBoard[i].HasZombie(j) then
       begin
-        location[y] := i;
-        location[y + 1] := j;
+        location[y] := j;
+        location[y + 1] := i;
         y := y + 2;
       end;
 
@@ -107,9 +111,9 @@ var
   i: integer;
 begin
   arr := GetZombieLocation;
-  for i := 1 to Length(arr) - 1 do
-    if arr[i] = 0 then
-      Exit(True);
+  i := 0;
+  while i < Length(arr) do
+    if arr[i] = 0 then Exit(True) else i += 2;
   Result := False;
 end;
 
@@ -125,6 +129,18 @@ begin
 end;
 
 {
+Simulates hitting Zombies by Peas on each row and if Pea kill Zombie add point to the player
+}
+procedure TBoard.HittingZombiePea;
+var
+  br: TBoardRow;
+begin
+  for br in FBoard do
+    FScore := br.HittingZbyP(FScore);
+end;
+
+
+{
 Increment money if at least one of the rows contains MoneyFlower (if more, values added)
 }
 procedure TBoard.IncrementMoney;
@@ -133,6 +149,17 @@ var
 begin
   for br in FBoard do
     FMoney := br.GenerateMoney(FMoney);
+end;
+
+{
+Generates peas for all of Plants across the Board
+}
+procedure TBoard.GeneratePeas;
+var
+  br: TBoardRow;
+begin
+  for br in FBoard do
+    br.GeneratePea;
 end;
 
 {
@@ -147,12 +174,26 @@ begin
 end;
 
 {
+Move Peas across board in each row
+}
+procedure TBoard.MovePeas;
+var
+  br: TBoardRow;
+begin
+  for br in FBoard do
+    br.MovePea;
+end;
+
+{
 Main method that runs the Zombie generation, simulates fight method, moves zombies across board and prints board.
 }
 procedure TBoard.RunBoard;
 begin
   IncrementMoney;
   FightPlantZombie;
+  HittingZombiePea;
+  MovePeas;
+  GeneratePeas;
   MoveZombies;
   GenerateZombieSpawn;
 end;
@@ -171,9 +212,9 @@ begin
       if not FBoard[randRow].HasZombie(BOARD_COLS - 1) then
         begin
           if Random(2) = 0 then
-            AddZombie(randRow, BOARD_COLS - 1, TZombie.Create('Zombie1', 100, 20, 10, 'ImagePath'))
+            AddZombie(randRow, BOARD_COLS - 1, TZombie.Create('Zombie1', 100, 20, 10))
           else
-            AddZombie(randRow, BOARD_COLS - 1, TZombie.Create('Zombie2', 200, 15, 20, 'ImagePath')); // Разобраться с путями
+            AddZombie(randRow, BOARD_COLS - 1, TZombie.Create('Zombie2', 200, 15, 20));
           Dec(FZombiesToSpawn);
         end;
     end;
@@ -195,6 +236,25 @@ begin
         FBoard[x].AddPlant(y, plant);
         FMoney := FMoney - 50;
         Exit(plant);
+      end;
+  Result := nil;
+end;
+
+{
+Adds Pea object on a specific coordinate
+@param x     int column index
+@param y     int row index
+@param pea Pea object
+@return Pea returns the pea if it was added, null otherwise
+}
+function TBoard.AddPea(x: integer; y: integer; pea: TPea): TPea;
+begin
+  if (x >= 0) and (x < BOARD_COLS) and (y >= 0) and (y < BOARD_COLS) then
+    if pea <> nil then
+      if not FBoard[x].HasPea(y) then
+      begin
+        FBoard[x].AddPea(y, pea);
+        Exit(pea);
       end;
   Result := nil;
 end;

@@ -11,9 +11,9 @@ type
   private
     FScoreOnDeath: Integer;
   public
-    constructor Create(name: String; health: Integer; imgURL: String); overload;
-    constructor Create(name: String; health: Integer; attackPower: Integer; imgURL: String); overload;
-    constructor Create(name: String; health: Integer; attackPower: Integer; scoreOnDeath: Integer; imgURL: String); overload;
+    constructor Create(name: String; health: Integer); overload;
+    constructor Create(name: String; health: Integer; attackPower: Integer); overload;
+    constructor Create(name: String; health: Integer; attackPower: Integer; scoreOnDeath: Integer); overload;
     function getPointsOnDeath: Integer;
     procedure attack(npc: TNPC); override;
   end;
@@ -25,9 +25,9 @@ Initializes a new zombie
 @param health Zombie's health
 @param imgURL ImageIcon of the zombie on the board (GUI)
 }
-constructor TZombie.Create(name: String; health: Integer; imgURL: String);
+constructor TZombie.Create(name: String; health: Integer);
 begin
-  inherited Create(name, health, imgURL);
+  inherited Create(name, health);
 end;
 
 {
@@ -37,9 +37,9 @@ Initializes a new zombie
 @param attackPower zombie's attack power
 @param imgURL ImageIcon of the zombie on the board (GUI)
 }
-constructor TZombie.Create(name: String; health, attackPower: Integer; imgURL: String);
+constructor TZombie.Create(name: String; health, attackPower: Integer);
 begin
-  inherited Create(name, health, attackPower, imgURL);
+  inherited Create(name, health, attackPower);
 end;
 
 {
@@ -50,9 +50,9 @@ Initializes a new zombie
 @param scoreOnDeath score added to the player when zombie is died
 @param imgURL ImageIcon of the zombie on the board (GUI)
 }
-constructor TZombie.Create(name: String; health, attackPower, scoreOnDeath: Integer; imgURL: String);
+constructor TZombie.Create(name: String; health, attackPower, scoreOnDeath: Integer);
 begin
-  inherited Create(name, health, attackPower, imgURL);
+  inherited Create(name, health, attackPower);
   Self.FScoreOnDeath := scoreOnDeath;
 end;
 

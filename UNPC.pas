@@ -6,7 +6,6 @@ interface
 type
   TNPC = class(TInterfacedObject)
   private
-    FImgURL: String;
     FHealth: Integer;
     FName: String;
     FAttackPower: Integer;
@@ -15,17 +14,15 @@ type
 Initializes a new NPC
 @param name NPC's name
 @param health NPC's health
-@param imgURL ImageIcon url of the image for NPS's on the board
 }
-    constructor Create(name: String; health: Integer; imgURL: String); overload;
+    constructor Create(name: String; health: Integer); overload;
 {
 Initializes a new NPC
 @param name NPC's name
 @param health NPC's health
 @param attackPower NPC's attack power
-@param imgURL ImageIcon url of the image for NPS's on the board
 }
-    constructor Create(name: String; health: Integer; attackPower: Integer; imgURL: String); overload;
+    constructor Create(name: String; health: Integer; attackPower: Integer); overload;
 {
 Returns true if the NPC's health is greater than 0, false otherwise
 @return boolean returns true if NPC alive; false - otherwise
@@ -50,11 +47,7 @@ Attacks npc, implemented in subclasses
 @param npc NPC to be attacked
 }
     procedure attack(npc: TNPC); virtual; abstract;
-{
-Returns url to the image of NPC's
-@return ImageIcon url
-}
-    function getImgURL: String;
+
 {
 Return that name of the NPC's
 @return String name
@@ -64,19 +57,17 @@ Return that name of the NPC's
 
 implementation
 
-constructor TNPC.Create(name: String; health: Integer; imgURL: String);
+constructor TNPC.Create(name: String; health: Integer);
 begin
-  Self.FName := name;
-  Self.FHealth := health;
-  Self.FImgURL := imgURL;
+  FName := name;
+  FHealth := health;
 end;
 
-constructor TNPC.Create(name: String; health, attackPower: Integer; imgURL: String);
+constructor TNPC.Create(name: String; health, attackPower: Integer);
 begin
-  Self.FName := name;
-  Self.FHealth := health;
-  Self.FAttackPower := attackPower;
-  Self.FImgURL := imgURL;
+  FName := name;
+  FHealth := health;
+  FAttackPower := attackPower;
 end;
 
 function TNPC.isAlive: Boolean;
@@ -97,11 +88,6 @@ end;
 function TNPC.getAttackPower: Integer;
 begin
   Result := FAttackPower;
-end;
-
-function TNPC.getImgURL: String;
-begin
-  Result := FImgURL;
 end;
 
 function TNPC.getName: String;

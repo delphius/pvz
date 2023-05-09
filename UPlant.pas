@@ -9,10 +9,13 @@ uses UNPC;
 
 type
   TPlant = class(TNPC)
+  private
+    FShoot: boolean;
   public
-    constructor Create(name: String; health: Integer; imgURL: String); overload;
-    constructor Create(name: String; health: Integer; attackPower: Integer; imgURL: String); overload;
+    constructor Create(name: String; health: Integer); overload;
+    constructor Create(name: String; health: Integer; attackPower: Integer); overload;
     procedure attack(npc: TNPC); override;
+    function isShoot: boolean;
   end;
 
 implementation
@@ -22,9 +25,10 @@ Initializes a new Plant
 @param health Plant's health
 @param imgURL ImageIcon image of the plant on the board (GUI)
 }
-constructor TPlant.Create(name: String; health: Integer; imgURL: String);
+constructor TPlant.Create(name: String; health: Integer);
 begin
-  inherited Create(name, health, imgURL);
+  inherited Create(name, health);
+  FShoot := false;
 end;
 
 {
@@ -34,9 +38,9 @@ Initializes a new Plant
 @param attackPower Plant's attack power
 @param imgURL ImageIcon image of the plant on the board (GUI)
 }
-constructor TPlant.Create(name: String; health, attackPower: Integer; imgURL: String);
+constructor TPlant.Create(name: String; health, attackPower: Integer);
 begin
-  inherited Create(name, health, attackPower, imgURL);
+  inherited Create(name, health, attackPower);
 end;
 
 {
@@ -47,5 +51,11 @@ procedure TPlant.attack(npc: TNPC);
 begin
   if (npc <> nil) and (npc.getHealth > 0) then
     npc.setHealth(npc.getHealth - getAttackPower);
+end;
+
+function TPlant.isShoot: boolean;
+begin
+  FShoot := not FShoot;
+  Result := FShoot;
 end;
 end.

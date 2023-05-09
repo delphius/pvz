@@ -5,7 +5,7 @@ Unit UBoardRow;
 
 interface
 
-Uses UBoardNode, UZombie, UPlant, UMoneyPlant;
+Uses UBoardNode, UZombie, UPlant, UMoneyPlant, UPea;
 
 type
   TBoardRow = class(TInterfacedObject)
@@ -13,12 +13,17 @@ type
     FNodes: array of TBoardNode;
   public
     constructor Create;
-    procedure moveZombie;
+    procedure  moveZombie;
+    procedure  movePea;
+    procedure  GeneratePea;
     procedure addZombie(index: Integer; newZombie: TZombie);
     procedure addPlant(index: Integer; newPlant: TPlant);
+    procedure addPea(index: Integer; newPea: TPea);
     function hasZombie(index: Integer): Boolean;
     function hasPlant(index: Integer): Boolean;
+    function hasPea(index: Integer): Boolean;
     function fightPvsZ(score: Integer): Integer;
+    function HittingZbyP(score: Integer): Integer;
     function generateMoney(money: Integer): Integer;
     function getRow: TArray<TBoardNode>;
   end;
@@ -40,7 +45,6 @@ end;
 
 {
 Moves zombies across plane (based on the number of node(s))
-Assign ZOMBIE_WON to true if zombie stays on the first node (end of the board) and this node does not contain plant.
 }
 procedure TBoardRow.moveZombie;
 var
@@ -56,6 +60,38 @@ begin
     if next.hasZombie and not current.hasZombie and not next.hasPlant then
       current.addZombie(next.destroyZombie);
   end;
+end;
+
+{
+Moves peas across plane (based on the number of node(s))
+}
+procedure TBoardRow.movePea;
+var
+  i: Integer;
+  current, next: TBoardNode;
+begin
+  current := FNodes[BOARD_COLS - 1];
+  if current.hasPea then current.removePea;
+  for i := BOARD_COLS - 2 downto 0 do
+  begin
+    current := FNodes[i];
+    next := FNodes[i + 1];
+    if current.hasPea and not next.hasZombie then next.addPea(current.removePea);
+  end;
+end;
+
+procedure TBoardRow.GeneratePea;
+var i: Integer;
+    current: TBoardNode;
+begin
+for i := 0 to BOARD_COLS - 1 do
+begin
+  current := FNodes[i];
+  if current.hasPlant and not current.hasPea then
+     begin
+         if current.getPlant.isShoot then current.addPea(TPea.Create('Pea', 0, 10));
+     end;
+end;
 end;
 
 {
@@ -78,6 +114,17 @@ procedure TBoardRow.addPlant(index: Integer; newPlant: TPlant);
 begin
   if newPlant <> nil then
     FNodes[index].addPlant(newPlant);
+end;
+
+{
+Adds Pea object to the specific position
+@param index int index where to add Pea
+@param newPea Pea object
+}
+procedure TBoardRow.addPea(index: Integer; newPea: TPea);
+begin
+  if newPea <> nil then
+    FNodes[index].addPea(newPea);
 end;
 
 {
@@ -107,41 +154,51 @@ begin
 end;
 
 {
+Check if the Pea exists in a specific position
+@param index position to check Pea instance
+@return boolean true if pea exists in the specified position; false - otherwise
+}
+function TBoardRow.hasPea(index: Integer): Boolean;
+begin
+  if index >= 0 then
+    Result := FNodes[index].hasPea
+  else
+    Result := False;
+end;
+
+{
 Simulates fighting between Plant and Zombie
 @param score int current player score
 @return int reward for the player when plant kills zombie
 }
 function TBoardRow.fightPvsZ(score: Integer): Integer;
 var
-  i, j: Integer;
-  plantFind, zombieFind: TBoardNode;
-  z: TZombie;
+  i: Integer;
+  CurrentNode: TBoardNode;
 begin
   for i := 0 to BOARD_COLS - 1 do
   begin
-    plantFind := FNodes[i];
-    if plantFind.hasPlant then
-    begin
-      for j := i to BOARD_COLS - 1 do
-      begin
-        zombieFind := FNodes[j];
-        if (plantFind = zombieFind) and plantFind.hasZombie then
+    CurrentNode := FNodes[i];
+    if CurrentNode.hasPlant and CurrentNode.hasZombie then
         begin
-          score += plantFind.plantFightZombie;
-          Break;
-        end else if (plantFind <> zombieFind) and zombieFind.hasZombie then
-        begin
-          z := plantFind.plantFightZombie(zombieFind.destroyZombie);
-          if z.getHealth <= 0 then
-          begin
-            zombieFind.addZombie(nil);
-            score += z.getPointsOnDeath;
-          end else
-            zombieFind.addZombie(z);
-          Break;
+          score += CurrentNode.plantFightZombie;
         end;
-      end;
-    end;
+  end;
+  Result := score;
+end;
+
+function TBoardRow.HittingZbyP(score: Integer): Integer;
+var
+  i: Integer;
+  CurrentNode: TBoardNode;
+begin
+  for i := 0 to BOARD_COLS - 1 do
+  begin
+    CurrentNode := FNodes[i];
+    if CurrentNode.hasPea and CurrentNode.hasZombie then
+        begin
+          score += CurrentNode.hitZombiePea;
+        end;
   end;
   Result := score;
 end;

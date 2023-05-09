@@ -3,27 +3,33 @@ Unit UBoardNode;
 
 interface
 
-uses UPlant, UZombie, UMoneyPlant;
+uses UPlant, UZombie, UMoneyPlant, UPea;
 
 type
   TBoardNode = class(TInterfacedObject)
   private
     FPlant: TPlant;
     FZombie: TZombie;
+    FPea: TPea;
   public
     constructor Create;
     function destroyZombie: TZombie;
     function addPlant(plant: TPlant): TPlant;
+    function addPea(pea: TPea): TPea;
     function plantFightZombie: Integer;
     function plantFightZombie(zombie: TZombie): TZombie;
+    function hitZombiePea: Integer;
     procedure addZombie(zombie: TZombie);
     function hasZombie: Boolean;
     function hasPlant: Boolean;
+    function hasPea: Boolean;
     function getPlant: TPlant;
     function getMoneyPlant: TMoneyPlant;
+    function getPea: TPea;
     function getZombie: TZombie;
     function hasMoneyPlant: Boolean;
     function removePlant: TPlant;
+    function removePea: TPea;
   end;
 
 implementation
@@ -34,6 +40,7 @@ constructor TBoardNode.Create;
 begin
   FPlant := nil;
   FZombie := nil;
+  FPea := nil;
 end;
 
 {
@@ -64,6 +71,21 @@ begin
   begin
     FPlant := plant;
     Result := FPlant;
+  end else
+    Result := nil;
+end;
+
+{
+Adds Pea instance to the current node
+@param pea new Pea
+@return Pea returns the pea if it was added, null otherwise
+}
+function TBoardNode.addPea(pea: TPea): TPea;
+begin
+  if FPea = nil then
+  begin
+    FPea := pea;
+    Result := FPea;
   end else
     Result := nil;
 end;
@@ -100,6 +122,25 @@ begin
 end;
 
 {
+Simulates hitting Zombie by Pea in current node
+@return int reward when pea kills zombie
+}
+function TBoardNode.hitZombiePea: Integer;
+begin
+  FPea.attack(FZombie);
+  if FZombie.getHealth <= 0 then
+  begin
+    Result := FZombie.getPointsOnDeath;
+    FZombie := nil;
+    FPea := nil;
+  end else
+  begin
+    FPea := nil;
+    Result := 0;
+  end;
+end;
+
+{
 Adds Zombie instance into the node
 @param zombie Zombie object
 }
@@ -127,6 +168,15 @@ begin
 end;
 
 {
+Check if the current node contain Pea object
+@return boolean returns true if this board node has a pea, false otherwise
+}
+function TBoardNode.hasPea: Boolean;
+begin
+  Result := FPea <> nil;
+end;
+
+{
 Returns plant instance if the current node
 @return Plant instance of the plant
 }
@@ -146,6 +196,15 @@ if (FPlant is TMoneyPlant) then
       else 
     Result:=nil; 
 end; 
+
+{
+Returns pea instance if the current node
+@return Pea instance of the pea
+}
+function TBoardNode.getPea: TPea;
+begin
+  Result := FPea;
+end;
 
 {
 Returns zombie instance of the current node
@@ -175,5 +234,22 @@ begin
   p:=FPlant; 
   FPlant:=nil;
   Result:=p; 
+end;
+
+{
+Removes this pea from the board and returns it
+@return Pea returns the removed pea
+}
+function TBoardNode.removePea:TPea;
+  var p:TPea;
+begin
+
+if FPea <> nil then
+  begin
+    p := FPea;
+    FPea := nil;
+    Result := p;
+  end else
+    Result := nil;
 end;
 end.
